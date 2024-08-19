@@ -1,0 +1,43 @@
+global:
+  scrape_interval:     15s # Intervalo de scrape a cada 15 segundos. O padrão é 1 minuto.
+  evaluation_interval: 15s # Avaliar regras a cada 15 segundos. O padrão é 1 minuto.
+  # scrape_timeout é definido como o padrão global (10s).
+
+  # Anexar esses rótulos a qualquer série temporal ou alertas ao se comunicar com
+  # sistemas externos (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'example'
+
+# Configuração do Alertmanager
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['localhost:9093']
+
+# Carregar regras uma vez e avaliá-las periodicamente de acordo com o 'evaluation_interval' global.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# Uma configuração de scrape contendo exatamente um endpoint para scrape:
+# Aqui é o próprio Prometheus.
+scrape_configs:
+  # O nome do trabalho é adicionado como um rótulo job=<job_name> a qualquer série temporal obtida desta configuração.
+  - job_name: 'prometheus'
+    # Substituir o padrão global e obter alvos deste trabalho a cada 5 segundos.
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    # metrics_path padrão é '/metrics'
+    # scheme padrão é 'http'.
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+  - job_name: 'pbs-internal'
+    static_configs:
+      - targets: ['SEU-IP INTERNO']
+  - job_name: 'pbs-external'
+    static_configs:
+      - targets: ['SEU-IP EXTERNO']
